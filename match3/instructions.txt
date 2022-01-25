@@ -1,0 +1,28 @@
+Säännöt:
+Pelissä voi vaihdella värillisten ruutujen (hedelmien) paikkoja 8*6 -kokoisella laudalla. Jos kolme saman väristä ruutua saadaan peräkkäin joko pysty- tai vaakasuoraan, ne poistetaan ja niiden tilalle pudotetaan puolen sekunnin viiveellä yläpuolella olleet hedelmät. Samalla kertaa voi poistaa enintään kolme eri kolmen peräkkäisen hedelmän sarjaa.
+
+Pudotettavat hedelmät valitaan kirjoittamalla koordinaattien kirjoittamiseen varattuun editoriin toisen hedelmän koordinaatit muodossa xy. Seuraavaksi voidaan näppäimistön enteriä painamalla aktivoituvien painonappien avulla valita, halutaanko tämän hedelmän paikkaa vaihtaa yhtä ylempänä vai seuraavana oikealla olevan hedelmän kanssa. Hedelmän voi vaihtaa vain toisen hedelmän kanssa, eikä sitä voi siirtää tyhjälle paikalle. Hedelmien poistosta saa pisteitä poistettujen hedelmien määrän mukaan.
+
+Pelissä voi valita, haluaako lisätä uusia hedelmiä pudotettujen tilalle vai ei. Lisäksi peli ottaa aikaa start-napin painalluksesta lähtien.
+
+***
+
+Ohjelman rakenne:
+Ohjelman graafinen käyttöliittymä koostuu peliruudukosta, jossa myös hedelmät ovat, kahdesta napista, jotka määrittelevät siirron suunnan sekä lineEdit-widgetistä, johon koordinaatit kirjoitetaan, sekä tätä vastaavasta labelista. Lisäksi pelissä on pelin aloittava start-nappi ja lopettava quit-nappi. Lisäominaisuuksina peliin on lisätty labelit pisteitä ja kuluneen ajan ilmoittamista varten sekä checkBoxit hedelmien tiputuksen viiveen sekä tyhjien paikkojen täytön valintaa varten.
+
+Pelialueen tilanne on tallennettu vektoriin vec_, joka sisältää vektoreita, jotka sisältävät osoittimet kuhunkin QGraphicsRectItem-tyyppiseen hedelmäruutuun. Vec_:n vektorit ovat rivejä ja niiden alkioiden indeksit vastaavat sarakkeita.
+
+Hedelmälajit on määrätty QGraphicsRectItemien värin mukaan ja jokaiselle satunnaislukugeneraattorin generoimalle luvulle on määritelty oma hedelmälaji switch-case rakennetta käyttäen. Hedelmän väri valitaan omassa funktiossa, jotta toimintaa voisi hyödyntää myös aloituksen jälkeenkin. 
+
+Kun lineEdit-widgettiin kirjoitetaan siirrettävän hedelmän koordinaatit ja pelaaja painaa enteriä, widgetti lähettää signaalin, joka aktivoi suunnan valitsemiseen tarkoitetut painonapit. Kun toista nappia painetaan, tarkistaa getCoordinates-funktio koordinaatit, ja jos ne ovat sääntöjen mukaiset, painonapit epäaktivoidaan ja hedelmien paikkoja vaihdetaan vaihtamalla oikeissa kohdissa olevien QGraphicsRectItemien värejä keskenään. Lopuksi tarkistetaan, onko pelilaudalla kolmen suoria. Jos koordinaatit eivät olleet oikeanlaiset, mitään ei tapahdu niin kauan, kunnes pelaaja syöttää kunnolliset koordinaatit.
+
+Kolmen suorien tarkistaminen tapahtuu itsessäänkin viiveellä, jotta ne voitaisiin tutkia uudestaan saman funktion kutsumana. checkThree-funktio käy pelilaudan läpi ensin vaaka- ja sitten pystysuoraan vertailemalla neliöiden väriä, jotta kaikki, myös pudotusten jälkeiset suorat löytyisivät helposti. Jos suora löytyy, kutsuu funktio seuraavaa, joka tiputtaa ylemmät hedelmät vaihtamalla niiden väriä. Funktiossa on erilaiset silmukat pystysuorille ja vaakasuorille suorille johtuen niiden erilaisesta pudotustavasta. Suoran suunta on välitetty funktiolle parametrinä, kuten myös aloituskoordinaatit. Väri vaihdetaan changeFruit-funktion avulla, jolle välitetään parametrina halutun hedelmän koordinaatit ja väri.
+
+Pisteet on tallennettu yksityiseen points_-muuttujaan, joka ilmoittaa poistettujen hedelmien määrän. Pisteet päivitetään labeliin checkThree-funktiossa. 
+
+Peliin kulunut aika ilmoitetaan timeLabelissa ja timerin timeout-signaali päivittää labeliin sekunnit. Peliin kulunut aika lasketaan start-napin painalluksesta asti sekunneissa. Start-napin klikkaaminen myös poistaa itsensä käytössä ja saa pelaamiseen tarvittavat widgetit näkyviksi.
+
+Pelissä ei ole pakko pitää viivettä hedelmien tiputukessa, vaan sen voi poistaa checkBoxin avulla. checkBoxin tila tarkistetaan siirtonappien slot-funktioissa ja checkThree-funktiota kutsutaan joko viiveellä tai ilman checkBoxin tilan mukaan.
+
+Viimeisenä lisäominaisuutena peliin on toteutettu tyhjien paikkojen täyttäminen uusilla hedelmillä, jos tämä ominaisuus on valittu fillingChecBoxin avulla pelin alussa. Ominaisuuden voi ottaa koska tahansa pois käytöstä, jos haluaa pelin etenevän kohti pakollista loppua, mutta sitä ei voi ottaa käyttöön enää alun jälkeen. Uudet hedelmät valitaan samalla tavalla kuin alussakin.
+
